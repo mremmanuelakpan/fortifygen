@@ -19,7 +19,13 @@ Available both as a **Chrome Extension (Manifest V3)** and a **standalone Mobile
 
 ## 🛠️ Installation & Setup
 
-### 1. Desktop Chrome Extension
+### 1. Mobile Home Screen App (Android & iOS)
+
+1. Open the live app link on your mobile browser: https://mremmanuelakpan.github.io/fortifygen/
+2. Tap your browser menu (⋮ in Chrome or Share in Safari) and select **Add to Home Screen**.
+3. Launch FortifyGen anytime as a standalone app!
+
+### 2. Desktop Chrome Extension
 
 1. Clone or download this repository.
 2. Open Google Chrome and navigate to `chrome://extensions/`.
@@ -27,13 +33,6 @@ Available both as a **Chrome Extension (Manifest V3)** and a **standalone Mobile
 4. Click **Load unpacked** in the top-left corner.
 5. Select the folder containing `manifest.json`, `popup.html`, and `popup.js`.
 6. Pin **FortifyGen** to your browser toolbar for quick access!
-
-### 2. Mobile Home Screen App (Android & iOS)
-
-1. Enable **GitHub Pages** for this repository (`Settings` > `Pages` > Set branch to `main` and folder to `/root`).
-2. Open your GitHub Pages URL (e.g., `https://<your-username>.github.io/fortifygen/`) on your mobile browser.
-3. Tap your browser menu (⋮ in Chrome or Share in Safari) and select **Add to Home Screen**.
-4. Launch FortifyGen anytime as a standalone app!
 
 ---
 
