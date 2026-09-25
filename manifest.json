@@ -1,0 +1,9 @@
+{
+"manifest_version": 3,
+"name": "FortifyGen - Password Generator",
+"version": "1.2",
+"description": "Generate ultra-secure, randomized passwords with customizable rules and dark/light glassmorphism theme.",
+"action": {
+"default_popup": "popup.html"
+}
+}

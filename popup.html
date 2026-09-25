@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Strong Password Generator</title>
+  <style>
+    :root {
+      --bg-color: radial-gradient(circle at 20% 20%, #1e1b4b 0%, #0f172a 100%);
+      --text-color: #f8fafc;
+      --header-border: rgba(255, 255, 255, 0.1);
+      --panel-bg: rgba(30, 41, 59, 0.45);
+      --panel-border: rgba(255, 255, 255, 0.12);
+      --slider-track: rgba(255, 255, 255, 0.15);
+      --slider-thumb: #3b82f6;
+      --checkbox-bg: rgba(15, 23, 42, 0.5);
+      --checkbox-border: rgba(255, 255, 255, 0.2);
+      --checkbox-hover: rgba(255, 255, 255, 0.15);
+      --muted-text: #94a3b8;
+      --btn-bg: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      --btn-hover: linear-gradient(135deg, #60a5fa 0%, #2563eb 100%);
+      --value-bg: rgba(15, 23, 42, 0.6);
+    }
+
+    .light-mode {
+      --bg-color: radial-gradient(circle at 10% 10%, #e0e7ff 0%, #f1f5f9 100%);
+      --text-color: #0f172a;
+      --header-border: rgba(0, 0, 0, 0.08);
+      --panel-bg: rgba(255, 255, 255, 0.55);
+      --panel-border: rgba(255, 255, 255, 0.6);
+      --slider-track: rgba(0, 0, 0, 0.12);
+      --slider-thumb: #2563eb;
+      --checkbox-bg: rgba(255, 255, 255, 0.7);
+      --checkbox-border: rgba(0, 0, 0, 0.2);
+      --checkbox-hover: rgba(255, 255, 255, 0.9);
+      --muted-text: #64748b;
+      --btn-bg: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      --btn-hover: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+      --value-bg: rgba(255, 255, 255, 0.8);
+    }
+
+    * { box-sizing: border-box; }
+    
+    body {
+      width: 360px;
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 16px;
+      transition: background 0.3s ease, color 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-height: 460px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ambient-glow-1, .ambient-glow-2 {
+      position: fixed; width: 144px; height: 144px; border-radius: 50%;
+      filter: blur(40px); pointer-events: none; z-index: 0;
+    }
+    .ambient-glow-1 { top: -48px; left: -48px; background: rgba(59, 130, 246, 0.2); }
+    .ambient-glow-2 { bottom: -48px; right: -48px; background: rgba(99, 102, 241, 0.2); }
+
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--header-border); padding-bottom: 12px;
+      position: relative; z-index: 10;
+    }
+    
+    .logo-wrap { display: flex; align-items: center; gap: 8px; color: #3b82f6; }
+    
+    .logo-icon {
+      padding: 6px; border-radius: 8px; background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.2); backdrop-filter: blur(12px);
+      display: flex; align-items: center; justify-content: center;
+    }
+    
+    .logo-text { font-size: 16px; font-weight: 700; letter-spacing: 0.5px; margin: 0; }
+    
+    .header-right { display: flex; align-items: center; gap: 10px; }
+    
+    .badge {
+      font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 9999px;
+      color: var(--muted-text); background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+    }
+
+    .theme-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+    .theme-switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(0, 0, 0, 0.3); border: 1px solid var(--panel-border);
+      transition: .4s; border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute; content: ""; height: 18px; width: 18px; left: 2px; bottom: 2px;
+      background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    input:checked + .slider { background-color: rgba(255, 255, 255, 0.4); }
+    input:checked + .slider:before { transform: translateX(20px); background-color: #0f172a; }
+    .theme-icon { position: absolute; top: 50%; transform: translateY(-50%); pointer-events: none; }
+    .icon-sun { left: 6px; color: #eab308; }
+    .icon-moon { right: 6px; color: #cbd5e1; }
+    .light-mode .icon-moon { color: #475569; }
+
+    main { display: flex; flex-direction: column; gap: 16px; position: relative; z-index: 10; }
+    
+    .card {
+      background: var(--panel-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--panel-border); border-radius: 16px; padding: 16px;
+      box-shadow: 0 8px 32px 0 rgba(0,0,0,0.15); display: flex; flex-direction: column; gap: 12px;
+    }
+    
+    .card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--header-border); padding-bottom: 8px;
+    }
+    
+    .card-title {
+      font-size: 12px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 1px; color: var(--muted-text); display: flex; align-items: center; gap: 6px;
+    }
+    .card-title svg { color: #60a5fa; }
+    
+    .action-group { display: flex; align-items: center; gap: 6px; }
+    
+    .btn-action {
+      padding: 4px 10px; background: rgba(37, 99, 235, 0.8); color: white;
+      border-radius: 8px; font-size: 11px; font-weight: 500; border: none;
+      cursor: pointer; display: flex; align-items: center; gap: 4px;
+      transition: 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.1); backdrop-filter: blur(4px);
+    }
+    .btn-action:hover { background: #3b82f6; }
+    
+    .password-box {
+      font-size: 16px; font-family: monospace; text-align: left;
+      word-break: break-all; min-height: 40px; display: flex; align-items: center;
+      letter-spacing: 1px; overflow-y: auto; max-height: 96px;
+      padding: 4px 0; user-select: all; scrollbar-width: none;
+    }
+    .password-box::-webkit-scrollbar { display: none; }
+    .text-muted { color: var(--muted-text) !important; }
+
+    .strength-area { padding-top: 8px; border-top: 1px solid var(--header-border); }
+    .strength-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .strength-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--muted-text); }
+    .strength-val { font-size: 12px; font-weight: 700; color: var(--muted-text); }
+    
+    .strength-bar-bg { height: 6px; width: 100%; border-radius: 9999px; background: rgba(0,0,0,0.2); overflow: hidden; }
+    .light-mode .strength-bar-bg { background: rgba(0,0,0,0.1); }
+    .strength-bar-fill { height: 100%; transition: width 0.3s, background-color 0.3s; width: 0; }
+    
+    .strength-weak { background-color: #ef4444; width: 33%; box-shadow: 0 0 8px rgba(239, 68, 68, 0.5); }
+    .strength-medium { background-color: #facc15; width: 66%; box-shadow: 0 0 8px rgba(250, 204, 21, 0.5); }
+    .strength-strong { background-color: #4ade80; width: 100%; box-shadow: 0 0 10px rgba(74, 222, 128, 0.6); }
+
+    .slider-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .slider-label { font-size: 14px; font-weight: 500; }
+    .slider-val {
+      font-size: 16px; font-weight: 700; color: #60a5fa; padding: 2px 10px;
+      border-radius: 8px; border: 1px solid var(--panel-border); background: var(--value-bg);
+    }
+    
+    input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%;
+      background: var(--slider-thumb); cursor: pointer; margin-top: -7px;
+      box-shadow: 0 0 12px rgba(59, 130, 246, 0.6); border: 2px solid rgba(255, 255, 255, 0.8);
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%; height: 4px; cursor: pointer; background: var(--slider-track); border-radius: 2px;
+    }
+    input[type=range]:focus { outline: none; }
+    
+    .slider-minmax { display: flex; justify-content: space-between; font-size: 11px; margin-top: 4px; color: var(--muted-text); }
+
+    .options-group {
+      margin-top: 12px; border-top: 1px solid var(--header-border); padding-top: 12px;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+
+    .checkbox-container {
+        display: block; position: relative; padding-left: 30px;
+        margin-bottom: 6px; cursor: pointer; font-size: 14px; user-select: none;
+    }
+    .checkbox-container input { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; }
+    .checkmark {
+        position: absolute; top: 0; left: 0; height: 20px; width: 20px;
+        background-color: var(--checkbox-bg); border-radius: 6px;
+        border: 1px solid var(--checkbox-border); transition: all 0.2s ease;
+    }
+    .checkbox-container:hover input ~ .checkmark { background-color: var(--checkbox-hover); border-color: rgba(59, 130, 246, 0.5); }
+    .checkbox-container input:checked ~ .checkmark {
+        background-color: var(--slider-thumb); border-color: var(--slider-thumb);
+        box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
+    }
+    .checkmark:after { content: ""; position: absolute; display: none; }
+    .checkbox-container input:checked ~ .checkmark:after { display: block; }
+    .checkbox-container .checkmark:after {
+        left: 7px; top: 3px; width: 5px; height: 10px; border: solid white;
+        border-width: 0 2px 2px 0; transform: rotate(45deg);
+    }
+    .check-hint { color: var(--muted-text); margin-left: 4px; font-size: 12px; }
+
+    .btn-generate {
+      width: 100%; color: white; font-weight: 700; padding: 12px 16px;
+      border-radius: 12px; background: var(--btn-bg);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25); transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      border: none; cursor: pointer; font-size: 16px; margin-top: 0;
+    }
+    .btn-generate:hover { background: var(--btn-hover); transform: scale(1.01); }
+    .btn-generate:active { transform: scale(0.99); }
+    .btn-generate svg { color: #fde047; }
+
+    @keyframes pulse-green {
+      0% { transform: scale(1); color: #4ade80; }
+      50% { transform: scale(1.2); color: #22c55e; }
+      100% { transform: scale(1); color: #4ade80; }
+    }
+    .copied-anim { animation: pulse-green 0.3s ease-in-out; }
+  </style>
+</head>
+<body>
+
+  <div class="ambient-glow-1"></div>
+  <div class="ambient-glow-2"></div>
+  
+  <header>
+    <div class="logo-wrap">
+      <div class="logo-icon">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+      </div>
+      <h1 class="logo-text">FortifyGen</h1>
+    </div>
+    
+    <div class="header-right">
+        <label class="theme-switch" title="Toggle Light/Dark Mode">
+          <input type="checkbox" id="theme-toggle">
+          <span class="slider">
+              <svg class="theme-icon icon-sun" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>
+              <svg class="theme-icon icon-moon" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path></svg>
+          </span>
+        </label>
+        <span class="badge">v1.2</span>
+    </div>
+  </header>
+
+  <main>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>
+          Password
+        </span>
+        
+        <div class="action-group">
+          <button id="toggle-visibility-btn" class="btn-action" title="Hide password">
+            <svg id="icon-eye" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            <svg id="icon-eye-slash" style="display:none;" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24M1 1l22 22"></path></svg>
+            <span id="visibility-text">Hide</span>
+          </button>
+          <button id="copy-btn" class="btn-action" title="Copy to clipboard">
+            <svg id="icon-copy" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path></svg>
+            <svg id="icon-check" class="copied-anim" style="display:none; color: #4ade80;" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg>
+            <span>Copy</span>
+          </button>
+        </div>
+      </div>
+      
+      <div id="password-display" class="password-box text-muted">Click Generate</div>
+      
+      <div class="strength-area">
+        <div class="strength-flex">
+          <span class="strength-label">Strength</span>
+          <span id="strength-text" class="strength-val">-</span>
+        </div>
+        <div class="strength-bar-bg">
+          <div id="strength-bar" class="strength-bar-fill"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div>
+        <div class="slider-row">
+          <label class="slider-label">Password Length</label>
+          <span id="length-val" class="slider-val">24</span>
+        </div>
+        <input type="range" id="length-slider" min="12" max="64" value="24">
+        <div class="slider-minmax">
+          <span>12</span>
+          <span>Ultra Secure (64)</span>
+        </div>
+      </div>
+
+      <div class="options-group">
+        <label class="checkbox-container">
+          <span>Include Uppercase <span class="check-hint">(A-Z)</span></span>
+          <input type="checkbox" id="chk-upper" checked>
+          <span class="checkmark"></span>
+        </label>
+        
+        <label class="checkbox-container">
+          <span>Include Lowercase <span class="check-hint">(a-z)</span></span>
+          <input type="checkbox" id="chk-lower" checked>
+          <span class="checkmark"></span>
+        </label>
+        
+        <label class="checkbox-container">
+          <span>Include Numbers <span class="check-hint">(0-9)</span></span>
+          <input type="checkbox" id="chk-numbers" checked>
+          <span class="checkmark"></span>
+        </label>
+        
+        <label class="checkbox-container">
+          <span>Include Symbols <span class="check-hint">(!@#$...)</span></span>
+          <input type="checkbox" id="chk-symbols" checked>
+          <span class="checkmark"></span>
+        </label>
+      </div>
+    </div>
+
+    <button id="generate-btn" class="btn-generate">
+      <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+      Generate Strong Password
+    </button>
+  </main>
+
+  <!-- 
+  ====================================================================
+  ⚠️ CHROME EXTENSION REQUIREMENT ⚠️
+  Cut everything below (between <script> and </script>) and paste it 
+  into a new file called popup.js in the same folder.
+  Then replace this entire block with <script src="popup.js"></script>
+  ====================================================================
+  -->
+  <script src="popup.js"></script>
+</body>
+</html>
