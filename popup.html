@@ -3,93 +3,100 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Strong Password Generator</title>
+  <title>FortifyGen</title>
+
   <style>
     :root {
       --bg-color: radial-gradient(circle at 20% 20%, #1e1b4b 0%, #0f172a 100%);
       --text-color: #f8fafc;
       --header-border: rgba(255, 255, 255, 0.1);
-      --panel-bg: rgba(30, 41, 59, 0.45);
+      --panel-bg: rgba(30, 41, 59, 0.55);
       --panel-border: rgba(255, 255, 255, 0.12);
+      --input-bg: rgba(15, 23, 42, 0.6);
       --slider-track: rgba(255, 255, 255, 0.15);
       --slider-thumb: #3b82f6;
       --checkbox-bg: rgba(15, 23, 42, 0.5);
       --checkbox-border: rgba(255, 255, 255, 0.2);
-      --checkbox-hover: rgba(255, 255, 255, 0.15);
       --muted-text: #94a3b8;
       --btn-bg: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-      --btn-hover: linear-gradient(135deg, #60a5fa 0%, #2563eb 100%);
+      --btn-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      --btn-danger: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
       --value-bg: rgba(15, 23, 42, 0.6);
+      --badge-bg: rgba(59, 130, 246, 0.2);
+      --error-text: #f87171;
     }
 
     .light-mode {
       --bg-color: radial-gradient(circle at 10% 10%, #e0e7ff 0%, #f1f5f9 100%);
       --text-color: #0f172a;
       --header-border: rgba(0, 0, 0, 0.08);
-      --panel-bg: rgba(255, 255, 255, 0.55);
-      --panel-border: rgba(255, 255, 255, 0.6);
+      --panel-bg: rgba(255, 255, 255, 0.65);
+      --panel-border: rgba(0, 0, 0, 0.12);
+      --input-bg: rgba(255, 255, 255, 0.85);
       --slider-track: rgba(0, 0, 0, 0.12);
       --slider-thumb: #2563eb;
       --checkbox-bg: rgba(255, 255, 255, 0.7);
       --checkbox-border: rgba(0, 0, 0, 0.2);
-      --checkbox-hover: rgba(255, 255, 255, 0.9);
-      --muted-text: #64748b;
+      --muted-text: #475569;
       --btn-bg: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-      --btn-hover: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
       --value-bg: rgba(255, 255, 255, 0.8);
+      --badge-bg: rgba(37, 99, 235, 0.15);
+      --error-text: #b91c1c;
     }
 
-    * { box-sizing: border-box; }
-    
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    :focus-visible { outline: 2px solid #60a5fa; outline-offset: 2px; }
+
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+    }
+
     body {
-      width: 360px;
-      font-family: 'Inter', -apple-system, sans-serif;
+      width: 100%;
+      max-width: 480px;
+      margin: 0 auto;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       background: var(--bg-color);
       color: var(--text-color);
-      margin: 0;
       padding: 16px;
-      transition: background 0.3s ease, color 0.3s ease;
+      min-height: 100vh;
+      min-height: 100dvh;
       display: flex;
       flex-direction: column;
       gap: 16px;
-      min-height: 460px;
       position: relative;
-      overflow: hidden;
+      overflow-x: hidden;
     }
 
     .ambient-glow-1, .ambient-glow-2 {
-      position: fixed; width: 144px; height: 144px; border-radius: 50%;
-      filter: blur(40px); pointer-events: none; z-index: 0;
+      position: fixed; width: 180px; height: 180px; border-radius: 50%;
+      filter: blur(50px); pointer-events: none; z-index: 0;
     }
-    .ambient-glow-1 { top: -48px; left: -48px; background: rgba(59, 130, 246, 0.2); }
-    .ambient-glow-2 { bottom: -48px; right: -48px; background: rgba(99, 102, 241, 0.2); }
+    .ambient-glow-1 { top: -48px; left: -48px; background: rgba(59, 130, 246, 0.25); }
+    .ambient-glow-2 { bottom: -48px; right: -48px; background: rgba(99, 102, 241, 0.25); }
 
     header {
       display: flex; align-items: center; justify-content: space-between;
       border-bottom: 1px solid var(--header-border); padding-bottom: 12px;
       position: relative; z-index: 10;
     }
-    
+
     .logo-wrap { display: flex; align-items: center; gap: 8px; color: #3b82f6; }
-    
+
     .logo-icon {
       padding: 6px; border-radius: 8px; background: rgba(59, 130, 246, 0.1);
       border: 1px solid rgba(59, 130, 246, 0.2); backdrop-filter: blur(12px);
       display: flex; align-items: center; justify-content: center;
     }
-    
-    .logo-text { font-size: 16px; font-weight: 700; letter-spacing: 0.5px; margin: 0; }
-    
+
+    .logo-text { font-size: 18px; font-weight: 700; letter-spacing: 0.5px; margin: 0; }
+
     .header-right { display: flex; align-items: center; gap: 10px; }
-    
-    .badge {
-      font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 9999px;
-      color: var(--muted-text); background: var(--panel-bg);
-      border: 1px solid var(--panel-border);
-    }
 
     .theme-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
-    .theme-switch input { opacity: 0; width: 0; height: 0; }
+    .theme-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
     .slider {
       position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
       background-color: rgba(0, 0, 0, 0.3); border: 1px solid var(--panel-border);
@@ -99,60 +106,78 @@
       position: absolute; content: ""; height: 18px; width: 18px; left: 2px; bottom: 2px;
       background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
-    input:checked + .slider { background-color: rgba(255, 255, 255, 0.4); }
-    input:checked + .slider:before { transform: translateX(20px); background-color: #0f172a; }
+    .theme-switch input:checked + .slider { background-color: rgba(255, 255, 255, 0.4); }
+    .theme-switch input:checked + .slider:before { transform: translateX(20px); background-color: #0f172a; }
+    .theme-switch input:focus-visible + .slider { outline: 2px solid #60a5fa; outline-offset: 2px; }
     .theme-icon { position: absolute; top: 50%; transform: translateY(-50%); pointer-events: none; }
     .icon-sun { left: 6px; color: #eab308; }
     .icon-moon { right: 6px; color: #cbd5e1; }
-    .light-mode .icon-moon { color: #475569; }
 
-    main { display: flex; flex-direction: column; gap: 16px; position: relative; z-index: 10; }
-    
+    .nav-tabs {
+      display: flex; background: var(--panel-bg); padding: 4px; border-radius: 12px;
+      border: 1px solid var(--panel-border); backdrop-filter: blur(12px); z-index: 10;
+    }
+    .tab-btn {
+      flex: 1; padding: 10px; border: none; background: transparent; color: var(--muted-text);
+      font-size: 13px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      border: 1px solid transparent;
+    }
+    .tab-btn.active {
+      background: rgba(59, 130, 246, 0.2); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    main { display: flex; flex-direction: column; gap: 16px; position: relative; z-index: 10; flex: 1; }
+
+    .section { display: flex; flex-direction: column; gap: 16px; }
+
     .card {
       background: var(--panel-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
       border: 1px solid var(--panel-border); border-radius: 16px; padding: 16px;
       box-shadow: 0 8px 32px 0 rgba(0,0,0,0.15); display: flex; flex-direction: column; gap: 12px;
     }
-    
+
     .card-header {
       display: flex; align-items: center; justify-content: space-between;
-      border-bottom: 1px solid var(--header-border); padding-bottom: 8px;
+      border-bottom: 1px solid var(--header-border); padding-bottom: 8px; gap: 8px;
     }
-    
+
     .card-title {
       font-size: 12px; font-weight: 600; text-transform: uppercase;
-      letter-spacing: 1px; color: var(--muted-text); display: flex; align-items: center; gap: 6px;
+      letter-spacing: 1px; color: var(--muted-text); /*display: flex;*/ align-items: center; /*gap: 6px;*/
     }
     .card-title svg { color: #60a5fa; }
-    
-    .action-group { display: flex; align-items: center; gap: 6px; }
-    
+
+    .action-group { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+
     .btn-action {
-      padding: 4px 10px; background: rgba(37, 99, 235, 0.8); color: white;
-      border-radius: 8px; font-size: 11px; font-weight: 500; border: none;
-      cursor: pointer; display: flex; align-items: center; gap: 4px;
+      padding: 6px 12px; background: rgba(37, 99, 235, 0.8); color: white;
+      border-radius: 8px; font-size: 12px; font-weight: 500; border: none;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px;
       transition: 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.1); backdrop-filter: blur(4px);
+      min-height: 32px;
     }
-    .btn-action:hover { background: #3b82f6; }
-    
+    .btn-action:active { transform: scale(0.95); background: #3b82f6; }
+    .btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-action.secondary { background: rgba(148, 163, 184, 0.2); color: var(--text-color); }
+    .btn-action.success { background: var(--btn-success); }
+    .btn-action.danger { background: var(--btn-danger); }
+
     .password-box {
-      font-size: 16px; font-family: monospace; text-align: left;
-      word-break: break-all; min-height: 40px; display: flex; align-items: center;
-      letter-spacing: 1px; overflow-y: auto; max-height: 96px;
-      padding: 4px 0; user-select: all; scrollbar-width: none;
+      font-size: 15px; font-family: monospace; text-align: left;
+      word-break: break-all; min-height: 44px; display: flex; align-items: center;
+      letter-spacing: 1px; overflow-y: auto; max-height: 90px;
+      padding: 6px 0; user-select: all; scrollbar-width: none;
     }
-    .password-box::-webkit-scrollbar { display: none; }
     .text-muted { color: var(--muted-text) !important; }
 
     .strength-area { padding-top: 8px; border-top: 1px solid var(--header-border); }
-    .strength-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .strength-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
     .strength-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--muted-text); }
     .strength-val { font-size: 12px; font-weight: 700; color: var(--muted-text); }
-    
+
     .strength-bar-bg { height: 6px; width: 100%; border-radius: 9999px; background: rgba(0,0,0,0.2); overflow: hidden; }
-    .light-mode .strength-bar-bg { background: rgba(0,0,0,0.1); }
     .strength-bar-fill { height: 100%; transition: width 0.3s, background-color 0.3s; width: 0; }
-    
     .strength-weak { background-color: #ef4444; width: 33%; box-shadow: 0 0 8px rgba(239, 68, 68, 0.5); }
     .strength-medium { background-color: #facc15; width: 66%; box-shadow: 0 0 8px rgba(250, 204, 21, 0.5); }
     .strength-strong { background-color: #4ade80; width: 100%; box-shadow: 0 0 10px rgba(74, 222, 128, 0.6); }
@@ -163,181 +188,387 @@
       font-size: 16px; font-weight: 700; color: #60a5fa; padding: 2px 10px;
       border-radius: 8px; border: 1px solid var(--panel-border); background: var(--value-bg);
     }
-    
-    input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+
+    input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; background: transparent; height: 28px; }
     input[type=range]::-webkit-slider-thumb {
-      -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%;
-      background: var(--slider-thumb); cursor: pointer; margin-top: -7px;
+      -webkit-appearance: none; appearance: none; height: 22px; width: 22px; border-radius: 50%;
+      background: var(--slider-thumb); cursor: pointer; margin-top: -9px;
       box-shadow: 0 0 12px rgba(59, 130, 246, 0.6); border: 2px solid rgba(255, 255, 255, 0.8);
     }
     input[type=range]::-webkit-slider-runnable-track {
-      width: 100%; height: 4px; cursor: pointer; background: var(--slider-track); border-radius: 2px;
+      width: 100%; height: 6px; cursor: pointer; background: var(--slider-track); border-radius: 3px;
     }
-    input[type=range]:focus { outline: none; }
-    
-    .slider-minmax { display: flex; justify-content: space-between; font-size: 11px; margin-top: 4px; color: var(--muted-text); }
+    input[type=range]::-moz-range-thumb {
+      height: 18px; width: 18px; border-radius: 50%;
+      background: var(--slider-thumb); cursor: pointer;
+      box-shadow: 0 0 12px rgba(59, 130, 246, 0.6); border: 2px solid rgba(255, 255, 255, 0.8);
+    }
+    input[type=range]::-moz-range-track {
+      width: 100%; height: 6px; cursor: pointer; background: var(--slider-track); border-radius: 3px;
+    }
+
+    .slider-minmax { display: flex; justify-content: space-between; font-size: 11px; margin-top: 2px; color: var(--muted-text); }
 
     .options-group {
-      margin-top: 12px; border-top: 1px solid var(--header-border); padding-top: 12px;
-      display: flex; flex-direction: column; gap: 6px;
+      margin-top: 8px; border-top: 1px solid var(--header-border); padding-top: 10px;
+      display: flex; flex-direction: column; gap: 8px;
     }
 
     .checkbox-container {
-        display: block; position: relative; padding-left: 30px;
-        margin-bottom: 6px; cursor: pointer; font-size: 14px; user-select: none;
+      display: block; position: relative; padding-left: 32px; min-height: 22px;
+      margin-bottom: 4px; cursor: pointer; font-size: 14px; user-select: none;
     }
-    .checkbox-container input { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; }
+    .checkbox-container input { position: absolute; opacity: 0; cursor: pointer; height: 22px; width: 22px; left: 0; top: 0; margin: 0; }
     .checkmark {
-        position: absolute; top: 0; left: 0; height: 20px; width: 20px;
-        background-color: var(--checkbox-bg); border-radius: 6px;
-        border: 1px solid var(--checkbox-border); transition: all 0.2s ease;
+      position: absolute; top: 0; left: 0; height: 22px; width: 22px;
+      background-color: var(--checkbox-bg); border-radius: 6px;
+      border: 1px solid var(--checkbox-border); transition: all 0.2s ease;
     }
-    .checkbox-container:hover input ~ .checkmark { background-color: var(--checkbox-hover); border-color: rgba(59, 130, 246, 0.5); }
     .checkbox-container input:checked ~ .checkmark {
-        background-color: var(--slider-thumb); border-color: var(--slider-thumb);
-        box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
+      background-color: var(--slider-thumb); border-color: var(--slider-thumb);
     }
+    .checkbox-container input:focus-visible ~ .checkmark { outline: 2px solid #60a5fa; outline-offset: 2px; }
     .checkmark:after { content: ""; position: absolute; display: none; }
     .checkbox-container input:checked ~ .checkmark:after { display: block; }
     .checkbox-container .checkmark:after {
-        left: 7px; top: 3px; width: 5px; height: 10px; border: solid white;
-        border-width: 0 2px 2px 0; transform: rotate(45deg);
+      left: 8px; top: 4px; width: 5px; height: 10px; border: solid white;
+      border-width: 0 2px 2px 0; transform: rotate(45deg);
     }
-    .check-hint { color: var(--muted-text); margin-left: 4px; font-size: 12px; }
 
     .btn-generate {
-      width: 100%; color: white; font-weight: 700; padding: 12px 16px;
+      width: 100%; color: white; font-weight: 700; padding: 14px 16px;
       border-radius: 12px; background: var(--btn-bg);
       box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25); transition: all 0.2s;
       display: flex; align-items: center; justify-content: center; gap: 8px;
-      border: none; cursor: pointer; font-size: 16px; margin-top: 0;
+      border: none; cursor: pointer; font-size: 16px;
     }
-    .btn-generate:hover { background: var(--btn-hover); transform: scale(1.01); }
-    .btn-generate:active { transform: scale(0.99); }
-    .btn-generate svg { color: #fde047; }
+    .btn-generate:active { transform: scale(0.98); }
+    .btn-generate:disabled { opacity: 0.6; cursor: not-allowed; }
 
-    @keyframes pulse-green {
-      0% { transform: scale(1); color: #4ade80; }
-      50% { transform: scale(1.2); color: #22c55e; }
-      100% { transform: scale(1); color: #4ade80; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: 12px; font-weight: 600; color: var(--muted-text); }
+    .form-input {
+      padding: 10px 12px; border-radius: 10px; border: 1px solid var(--panel-border);
+      background: var(--input-bg); color: var(--text-color); font-size: 16px; outline: none;
+      width: 100%;
     }
-    .copied-anim { animation: pulse-green 0.3s ease-in-out; }
+    .form-input:focus { border-color: #3b82f6; }
+
+    .note { font-size: 12px; color: var(--muted-text); margin: 0; line-height: 1.4; }
+    .note.center { text-align: center; }
+    .error-msg { font-size: 13px; color: var(--error-text); margin: 0; min-height: 0; }
+
+    .vault-toolbar { display: flex; gap: 8px; align-items: center; }
+    .search-box { flex: 1; }
+
+    .vault-list { display: flex; flex-direction: column; gap: 10px; max-height: 420px; overflow-y: auto; }
+    .vault-item {
+      background: rgba(15, 23, 42, 0.35); border: 1px solid var(--panel-border);
+      border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 6px;
+    }
+    .light-mode .vault-item { background: rgba(255, 255, 255, 0.5); }
+
+    .vault-item-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .vault-item-title { font-weight: 700; font-size: 15px; color: #60a5fa; word-break: break-word; }
+    .vault-item-user { font-size: 12px; color: var(--muted-text); word-break: break-all; }
+    .vault-item-row { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; gap: 8px; }
+    .vault-pass {
+      flex: 1; min-width: 0; padding: 6px 10px; font-family: monospace; font-size: 14px;
+      border: 1px solid var(--panel-border); border-radius: 10px; background: var(--input-bg);
+      word-break: break-all; max-height: 60px; overflow-y: auto;
+    }
+
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center; padding: 16px;
+      z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.2s; visibility: hidden;
+    }
+    .modal-overlay.active { opacity: 1; pointer-events: auto; visibility: visible; }
+    .modal-card {
+      background: var(--bg-color); border: 1px solid var(--panel-border);
+      border-radius: 18px; padding: 20px; width: 100%; max-width: 400px;
+      display: flex; flex-direction: column; gap: 14px; box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+      max-height: 100%; overflow-y: auto;
+    }
+    .modal-card h2 { margin: 0; font-size: 16px; color: #60a5fa; }
+    .modal-actions { display: flex; gap: 8px; margin-top: 8px; }
+    .modal-actions .btn-action { flex: 1; min-height: 40px; font-size: 13px; }
+
+    .badge-tag {
+      font-size: 10px; padding: 2px 6px; border-radius: 6px; background: var(--badge-bg);
+      color: #3b82f6; font-weight: 600; text-transform: uppercase; white-space: nowrap;
+    }
+
+    html.is-popup body { width: 380px; max-width: 380px; min-height: 560px; padding: 14px; gap: 12px; }
+    html.is-popup .vault-list { max-height: 230px; }
+    html.is-popup .password-box { max-height: 70px; }
+    html.is-tab #expand-btn { display: none; }
+
+    .toast {
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px);
+      background: rgba(15, 23, 42, 0.92); color: white; padding: 10px 20px; border-radius: 30px;
+      font-size: 13px; font-weight: 600; border: 1px solid var(--panel-border);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.3); transition: transform 0.3s ease; z-index: 200;
+      pointer-events: none; opacity: 0; max-width: calc(100vw - 32px); text-align: center;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
   </style>
 </head>
 <body>
 
   <div class="ambient-glow-1"></div>
   <div class="ambient-glow-2"></div>
-  
+
   <header>
     <div class="logo-wrap">
       <div class="logo-icon">
-        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
       </div>
       <h1 class="logo-text">FortifyGen</h1>
     </div>
-    
+
     <div class="header-right">
-        <label class="theme-switch" title="Toggle Light/Dark Mode">
-          <input type="checkbox" id="theme-toggle">
-          <span class="slider">
-              <svg class="theme-icon icon-sun" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>
-              <svg class="theme-icon icon-moon" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path></svg>
-          </span>
-        </label>
-        <span class="badge">v1.2</span>
+      <button id="expand-btn" class="btn-action secondary" type="button" title="Open in a full tab (needed for importing backups)" aria-label="Open in a full tab">⤢</button>
+      <label class="theme-switch" title="Toggle light/dark mode">
+        <input type="checkbox" id="theme-toggle" aria-label="Light mode">
+        <span class="slider">
+          <svg class="theme-icon icon-sun" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>
+          <svg class="theme-icon icon-moon" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path></svg>
+        </span>
+      </label>
     </div>
   </header>
 
-  <main>
-    <div class="card">
-      <div class="card-header">
-        <span class="card-title">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>
-          Password
-        </span>
-        
-        <div class="action-group">
-          <button id="toggle-visibility-btn" class="btn-action" title="Hide password">
-            <svg id="icon-eye" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-            <svg id="icon-eye-slash" style="display:none;" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24M1 1l22 22"></path></svg>
-            <span id="visibility-text">Hide</span>
-          </button>
-          <button id="copy-btn" class="btn-action" title="Copy to clipboard">
-            <svg id="icon-copy" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path></svg>
-            <svg id="icon-check" class="copied-anim" style="display:none; color: #4ade80;" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg>
-            <span>Copy</span>
-          </button>
-        </div>
-      </div>
-      
-      <div id="password-display" class="password-box text-muted">Click Generate</div>
-      
-      <div class="strength-area">
-        <div class="strength-flex">
-          <span class="strength-label">Strength</span>
-          <span id="strength-text" class="strength-val">-</span>
-        </div>
-        <div class="strength-bar-bg">
-          <div id="strength-bar" class="strength-bar-fill"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div>
-        <div class="slider-row">
-          <label class="slider-label">Password Length</label>
-          <span id="length-val" class="slider-val">24</span>
-        </div>
-        <input type="range" id="length-slider" min="12" max="64" value="24">
-        <div class="slider-minmax">
-          <span>12</span>
-          <span>Ultra Secure (64)</span>
-        </div>
-      </div>
-
-      <div class="options-group">
-        <label class="checkbox-container">
-          <span>Include Uppercase <span class="check-hint">(A-Z)</span></span>
-          <input type="checkbox" id="chk-upper" checked>
-          <span class="checkmark"></span>
-        </label>
-        
-        <label class="checkbox-container">
-          <span>Include Lowercase <span class="check-hint">(a-z)</span></span>
-          <input type="checkbox" id="chk-lower" checked>
-          <span class="checkmark"></span>
-        </label>
-        
-        <label class="checkbox-container">
-          <span>Include Numbers <span class="check-hint">(0-9)</span></span>
-          <input type="checkbox" id="chk-numbers" checked>
-          <span class="checkmark"></span>
-        </label>
-        
-        <label class="checkbox-container">
-          <span>Include Symbols <span class="check-hint">(!@#$...)</span></span>
-          <input type="checkbox" id="chk-symbols" checked>
-          <span class="checkmark"></span>
-        </label>
-      </div>
-    </div>
-
-    <button id="generate-btn" class="btn-generate">
-      <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
-      Generate Strong Password
+  <div class="nav-tabs" role="tablist" aria-label="Sections">
+    <button id="tab-btn-gen" class="tab-btn active" role="tab" aria-selected="true" aria-controls="sec-generator">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+      Generator
     </button>
+    <button id="tab-btn-vault" class="tab-btn" role="tab" aria-selected="false" aria-controls="sec-vault">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0110 0v4"></path></svg>
+      Encrypted Vault
+    </button>
+  </div>
+
+  <main>
+    <section id="sec-generator" class="section" role="tabpanel" aria-labelledby="tab-btn-gen">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>
+            Password
+          </span>
+
+          <div class="action-group">
+            <button id="toggle-visibility-btn" class="btn-action secondary" type="button" aria-pressed="false" title="Hide password">
+              <span id="visibility-text">Hide</span>
+            </button>
+            <button id="save-to-vault-btn" class="btn-action success" type="button" title="Save to local vault">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+              <span>Save</span>
+            </button>
+            <button id="copy-btn" class="btn-action" type="button" title="Copy to clipboard">
+              <span>Copy</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="password-display" class="password-box text-muted">Click Generate</div>
+
+        <div class="strength-area">
+          <div class="strength-flex">
+            <span class="strength-label">Strength</span>
+            <span id="strength-text" class="strength-val" role="status">-</span>
+          </div>
+          <div class="strength-bar-bg">
+            <div id="strength-bar" class="strength-bar-fill"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div>
+          <div class="slider-row">
+            <label class="slider-label" for="length-slider">Password Length</label>
+            <span id="length-val" class="slider-val">24</span>
+          </div>
+          <input type="range" id="length-slider" min="12" max="64" value="24">
+          <div class="slider-minmax">
+            <span>12</span>
+            <span>Ultra Secure (64)</span>
+          </div>
+        </div>
+
+        <div class="options-group">
+          <label class="checkbox-container">
+            <input type="checkbox" id="chk-upper" checked>
+            <span class="checkmark"></span>
+            <span>Include Uppercase (A-Z)</span>
+          </label>
+          <label class="checkbox-container">
+            <input type="checkbox" id="chk-lower" checked>
+            <span class="checkmark"></span>
+            <span>Include Lowercase (a-z)</span>
+          </label>
+          <label class="checkbox-container">
+            <input type="checkbox" id="chk-numbers" checked>
+            <span class="checkmark"></span>
+            <span>Include Numbers (0-9)</span>
+          </label>
+          <label class="checkbox-container">
+            <input type="checkbox" id="chk-symbols" checked>
+            <span class="checkmark"></span>
+            <span>Include Symbols (!@#$...)</span>
+          </label>
+          <label class="checkbox-container">
+            <input type="checkbox" id="chk-ambiguous">
+            <span class="checkmark"></span>
+            <span>Exclude look-alikes (I, l, 1, O, 0)</span>
+          </label>
+        </div>
+      </div>
+
+      <button id="generate-btn" class="btn-generate" type="button">
+        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+        Generate Strong Password
+      </button>
+    </section>
+
+    <section id="sec-vault" class="section" role="tabpanel" aria-labelledby="tab-btn-vault" style="display:none;">
+
+      <!-- Vault Auth Screen -->
+      <div id="vault-auth-card" class="card">
+        <div class="card-header">
+          <span class="card-title">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0110 0v4"></path></svg>
+            <span id="vault-auth-title">Vault Lock</span>
+          </span>
+        </div>
+
+        <form id="unlock-form" style="display:flex; flex-direction:column; gap:12px;" novalidate>
+          <p id="vault-auth-desc" class="note" style="font-size:13px;">
+            Enter your master passphrase to unlock your encrypted local vault.
+          </p>
+
+          <input type="text" id="vault-username-hint" class="sr-only" value="FortifyGen vault" autocomplete="username" tabindex="-1" aria-hidden="true" readonly>
+
+          <div class="form-group">
+            <label class="form-label" for="vault-pin-input">Master Passphrase</label>
+            <input type="password" id="vault-pin-input" class="form-input" placeholder="Enter master passphrase..." autocomplete="current-password">
+          </div>
+
+          <div id="confirm-pin-group" class="form-group" style="display:none;">
+            <label class="form-label" for="vault-pin-confirm">Confirm Master Passphrase</label>
+            <input type="password" id="vault-pin-confirm" class="form-input" placeholder="Re-enter passphrase..." autocomplete="new-password">
+            <p class="note">At least 12 characters. There is no recovery if you forget it.</p>
+          </div>
+
+          <p id="vault-auth-error" class="error-msg" role="alert"></p>
+
+          <button id="unlock-vault-btn" class="btn-generate" type="submit">Unlock Vault</button>
+        </form>
+
+        <p class="note center">🔒 Local-only: encrypted on this device, never sent anywhere.</p>
+      </div>
+
+      <!-- Vault Main Screen -->
+      <div id="vault-main-card" class="card" style="display:none;">
+        <div class="card-header">
+          <span class="card-title">
+            Saved Credentials (<span id="vault-count">0</span>)
+          </span>
+          <div class="action-group">
+            <button id="change-pass-btn" class="btn-action secondary" type="button" title="Change master passphrase">Passphrase</button>
+            <button id="lock-vault-btn" class="btn-action danger" type="button" title="Lock vault">Lock 🔒</button>
+          </div>
+        </div>
+
+        <div class="vault-toolbar">
+          <label class="sr-only" for="vault-search">Search saved accounts</label>
+          <input type="text" id="vault-search" class="form-input search-box" placeholder="Search saved accounts..." autocomplete="off">
+          <button id="add-entry-btn" class="btn-action success" type="button" title="Add item" aria-label="Add account">+</button>
+        </div>
+
+        <div id="vault-items-container" class="vault-list"></div>
+
+        <p class="note">Browsers can clear site data. Export a backup regularly and keep it somewhere safe. The backup stays encrypted with your passphrase.</p>
+
+        <div style="display:flex; gap:8px; border-top:1px solid var(--header-border); padding-top:10px;">
+          <button id="export-backup-btn" class="btn-action secondary" type="button" style="flex:1;">📥 Export Backup</button>
+          <button id="import-backup-btn" class="btn-action secondary" type="button" style="flex:1;">📤 Import Backup</button>
+        </div>
+      </div>
+    </section>
   </main>
 
-  <!-- 
-  ====================================================================
-  ⚠️ CHROME EXTENSION REQUIREMENT ⚠️
-  Cut everything below (between <script> and </script>) and paste it 
-  into a new file called popup.js in the same folder.
-  Then replace this entire block with <script src="popup.js"></script>
-  ====================================================================
-  -->
-  <script src="popup.js"></script>
+  <!-- Save / add entry modal -->
+  <div id="modal-save" class="modal-overlay">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-save-title">
+      <h2 id="modal-save-title">Save Account to Vault</h2>
+
+      <div class="form-group">
+        <label class="form-label" for="save-item-service">Service / App Name</label>
+        <input type="text" id="save-item-service" class="form-input" placeholder="e.g. Netflix, Google, Work Email" autocomplete="off">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="save-item-username">Username / Email</label>
+        <input type="text" id="save-item-username" class="form-input" placeholder="user@example.com" autocomplete="off">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="save-item-password">Password</label>
+        <input type="text" id="save-item-password" class="form-input" placeholder="Password" autocomplete="off" autocapitalize="off" spellcheck="false">
+      </div>
+
+      <div class="modal-actions">
+        <button id="cancel-save-btn" class="btn-action secondary" type="button">Cancel</button>
+        <button id="confirm-save-btn" class="btn-action success" type="button">Save Account</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Change passphrase modal -->
+  <div id="modal-pass" class="modal-overlay">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-pass-title">
+      <h2 id="modal-pass-title">Change Master Passphrase</h2>
+
+      <div class="form-group">
+        <label class="form-label" for="pass-current">Current passphrase</label>
+        <input type="password" id="pass-current" class="form-input" autocomplete="current-password">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="pass-new">New passphrase (min. 12 characters)</label>
+        <input type="password" id="pass-new" class="form-input" autocomplete="new-password">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="pass-new-confirm">Confirm new passphrase</label>
+        <input type="password" id="pass-new-confirm" class="form-input" autocomplete="new-password">
+      </div>
+      <p id="pass-error" class="error-msg" role="alert"></p>
+
+      <div class="modal-actions">
+        <button id="cancel-pass-btn" class="btn-action secondary" type="button">Cancel</button>
+        <button id="confirm-pass-btn" class="btn-action success" type="button">Change</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm modal -->
+  <div id="modal-confirm" class="modal-overlay">
+    <div class="modal-card" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title" aria-describedby="confirm-message">
+      <h2 id="confirm-title">Please confirm</h2>
+      <p id="confirm-message" class="note" style="font-size:14px; color:var(--text-color);"></p>
+      <div class="modal-actions">
+        <button id="confirm-cancel-btn" class="btn-action secondary" type="button">Cancel</button>
+        <button id="confirm-ok-btn" class="btn-action danger" type="button">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <input type="file" id="import-file-input" accept=".json,application/json" style="display:none;" tabindex="-1">
+  <div id="toast-msg" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="popup.js" defer></script>
 </body>
 </html>
