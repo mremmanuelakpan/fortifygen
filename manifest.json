@@ -1,9 +1,16 @@
 {
-"manifest_version": 3,
-"name": "FortifyGen - Password Generator",
-"version": "1.2",
-"description": "Generate ultra-secure, randomized passwords with customizable rules and dark/light glassmorphism theme.",
-"action": {
-"default_popup": "popup.html"
-}
+  "manifest_version": 3,
+  "name": "FortifyGen: Password Generator & Vault",
+  "version": "2.0.0",
+  "description": "Generate strong passwords and keep them in a local, AES-256 encrypted vault. Nothing leaves your device.",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "FortifyGen"
+  },
+  "permissions": [
+    "activeTab"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; base-uri 'none'; form-action 'none'"
+  }
 }
